@@ -1,0 +1,51 @@
+
+.jodit-workplace{
+    background:transparent !important;
+    border-radius: 0;
+	color: #000000;
+	size: 20px;
+	height: 100% !important;
+	
+}
+
+.jodit-ui-group .jodit-ui-group_line_true .jodit-ui-group_size_middle{
+	background: gray !important;
+    border-radius: 0;
+	height: 100% !important;
+	
+}
+.jodit-container {
+	border: 1px solid #ccc;
+	height: 100% !important;
+	
+	resize: vertical;
+	overflow: auto;
+  }
+
+.jodit-drag-and-drop__file-box{
+    border-radius: 0;
+	height: 300px !important;
+	color: #000000;
+}
+.jodit-ui-input__wrapper{
+	color: #000000;
+}
+.jodit-ui-checkbox__label{
+	
+	color: #000000;
+}
+
+.jodit-dialog__panel label {
+	color: #000000;
+  }
+
+  .jodit-dialog__panel input {
+	color: #000000; 
+  }
+  .jodit-status-bar{
+	display:none;
+  }
+
+  html {
+	scroll-behavior: smooth;
+  }
