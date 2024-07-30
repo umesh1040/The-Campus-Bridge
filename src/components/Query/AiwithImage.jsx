@@ -28,7 +28,7 @@ const AiwithImage = () => {
     async function aiImageRun() {
         setLoading(true);
         setResponse('');
-        const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const result = await model.generateContent([
             question, imageInlineData
         ]);
