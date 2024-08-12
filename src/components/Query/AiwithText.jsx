@@ -47,7 +47,7 @@ const AiwithText = () => {
             return;
         }
         setLoading(true);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
         const prompt = ` ${search}`;
         const result = await model.generateContent(prompt);
         const response = await result.response;
