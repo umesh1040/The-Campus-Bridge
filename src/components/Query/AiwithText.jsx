@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 
 const AiwithText = () => {
-    const genAI = new GoogleGenerativeAI("AIzaSyD9cLdw_AcP8EggEkkoGLEXJCi4dIvOgUA");
+    const genAI = new GoogleGenerativeAI("AIzaSyAoOrZcy6MtugZDAt6f3mzJLBVDkUQWE1E");
     const showToast = useShowToast();
     const [search, setSearch] = useState('');
     const [aiResponse, setResponse] = useState('');
