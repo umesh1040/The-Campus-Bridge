@@ -1,89 +1,104 @@
 import React, { useState } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-// import { GEMINI_API_KEY } from '../core/config'; 
-import {createRoot} from 'react-dom/client'
-import Markdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import { createRoot } from 'react-dom/client';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import useShowToast from "../../hooks/useShowToast";
 
 import {
     Box,
-    IconButton,
     Button,
-    Container,
     Flex,
-    FormControl,
     FormLabel,
     Textarea,
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalHeader,
-    ModalOverlay,
-    Tooltip,
-    useDisclosure,
-    Code,
-    Stack,
-    Spinner, // Import Spinner for loading animation
-    HStack, Progress
-  } from "@chakra-ui/react"; 
+    Progress,
+    Spinner
+} from "@chakra-ui/react";
+
 const AiwithText = () => {
-    const genAI = new GoogleGenerativeAI("AIzaSyD9cLdw_AcP8EggEkkoGLEXJCi4dIvOgUA"); 
- 
-	const showToast = useShowToast();
+    const genAI = new GoogleGenerativeAI("AIzaSyD9cLdw_AcP8EggEkkoGLEXJCi4dIvOgUA");
+    const showToast = useShowToast();
     const [search, setSearch] = useState('');
     const [aiResponse, setResponse] = useState('');
     const [loading, setLoading] = useState(false);
+
+    /**
+     * Exponential Backoff with Retry Logic
+     */
+    const fetchWithRetry = async (model, prompt, retries = 3, delay = 1000) => {
+        for (let attempt = 0; attempt < retries; attempt++) {
+            try {
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                const text = await response.text();
+                return text;
+            } catch (error) {
+                console.error(`Attempt ${attempt + 1} failed: ${error.message}`);
+                if (attempt < retries - 1) {
+                    await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, attempt)));
+                } else {
+                    throw error;
+                }
+            }
+        }
+    };
 
     /**
      * Generative AI Call to fetch text insights
      */
     async function aiRun() {
         setResponse('');
-        if (search=="") {
-			showToast("Error", 'Please Enter query before searching.', "error");
+        if (search.trim() === "") {
+            showToast("Error", 'Please enter a query before searching.', "error");
             return;
         }
+
         setLoading(true);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
-        const prompt = ` ${search}`;
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-        setResponse(text);
+        const prompt = `${search}`;
+
+        try {
+            const text = await fetchWithRetry(model, prompt);
+            setResponse(text);
+        } catch (error) {
+            showToast("Error", 'Failed to fetch response from AI. Please try again later.', "error");
+            console.error("API Request Error:", error);
+        }
+
         setLoading(false);
     }
 
     const handleChangeSearch = (e) => {
         setSearch(e.target.value);
-    }
+    };
 
     const handleClick = () => {
         aiRun();
-    }
+    };
 
     return (
         <Box>
-            <Box style={{ display: 'flex' }} flexDirection={"column"} > 
-              <FormLabel>Query</FormLabel>
-              <Textarea placeholder='query'  onChange={(e) => handleChangeSearch(e)} />
-                <Button  m={5} ml={0} width={"80px"} onClick={() => handleClick()}>Search</Button>
+            <Box style={{ display: 'flex' }} flexDirection={"column"}> 
+                <FormLabel>Query</FormLabel>
+                <Textarea placeholder='Enter your query here' onChange={handleChangeSearch} value={search} />
+                <Button m={5} ml={0} width={"80px"} onClick={handleClick}>Search</Button>
             </Box>
 
-            {
-                loading == true && (aiResponse == '') ?
-                <Flex spacing={3} gap={5} direction={"column"} overflow={"hidden"}>
-                    <Progress size='lg' width="800px" isIndeterminate  />
-                    <Progress size='lg' width="90%"  isIndeterminate  />
-                    <Progress size='lg' width="80%"  isIndeterminate  />
+            {loading ? (
+                <Flex direction="column" gap={3} alignItems="center" justifyContent="center" mt={5}>
+                    <Spinner size="xl" speed="0.65s" color="blue.500" />
+                    <Progress size='lg' width="80%" isIndeterminate />
                 </Flex>
-                    :
-                    <Box style={{ margin: '30px 0' }}> 
-                     <Markdown remarkPlugins={[remarkGfm]}>{aiResponse}</Markdown> 
-                    </Box>
-            }
+            ) : (
+                <Box style={{ margin: '30px 0' }}>
+                    {aiResponse ? (
+                        <Markdown remarkPlugins={[remarkGfm]}>{aiResponse}</Markdown>
+                    ) : (
+                        <Box color="gray.500">No response yet. Try entering a query.</Box>
+                    )}
+                </Box>
+            )}
         </Box>
     );
 };
