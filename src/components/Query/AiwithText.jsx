@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createRoot } from 'react-dom/client';
 import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import remarkGfm from 'remark-gfm'; 
 
 import useShowToast from "../../hooks/useShowToast";
 
