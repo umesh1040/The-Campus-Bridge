@@ -16,7 +16,7 @@ import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
 const AiwithImage = () => {
-    const genAI = new GoogleGenerativeAI("AIzaSyD9cLdw_AcP8EggEkkoGLEXJCi4dIvOgUA");
+    const genAI = new GoogleGenerativeAI("AIzaSyAoOrZcy6MtugZDAt6f3mzJLBVDkUQWE1E");
 	const showToast = useShowToast();
 
     const [image, setImage] = useState('');
